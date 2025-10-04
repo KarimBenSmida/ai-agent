@@ -1,0 +1,8 @@
+[build]
+command = ""
+publish = "public"
+
+# Either this inline config in the function file, or uncomment below:
+# [[edge_functions]]
+# path = "/api/ai/stream"
+# function = "ai-stream"
