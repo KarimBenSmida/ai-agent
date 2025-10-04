@@ -53,7 +53,6 @@ export default async (request: Request) => {
       model: "o4-mini",              // reasoning-capable model for "Thinking"
       reasoning: { effort: "medium" },
       stream: true,
-      temperature,
       input,
       // store: false,  // uncomment to disable OpenAI data retention (optional)
     }),
