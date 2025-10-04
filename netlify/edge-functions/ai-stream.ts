@@ -53,15 +53,21 @@ export default async (request: Request) => {
   const { messages = [], system } = payload;
 
   // Build the "input" format expected by the Responses API
-  const input = [
-    ...(system
-      ? [{ role: "system", content: [{ type: "input_text", text: system }] }]
-      : []),
-    ...messages.map((m: any) => ({
-      role: m.role,
-      content: [{ type: "input_text", text: m.content }],
-    })),
-  ];
+const input = [
+  ...(system
+    ? [{ role: "system", content: [{ type: "input_text", text: system }] }]
+    : []),
+  ...messages.map((m: any) => {
+    // assistant messages must use output_text
+    const isAssistant = m.role === "assistant";
+    const type = isAssistant ? "output_text" : "input_text";
+    return {
+      role: m.role, // 'user' | 'assistant' | 'system'
+      content: [{ type, text: m.content }],
+    };
+  }),
+];
+
 
   const apiKey = Netlify.env.get("OPENAI_API_KEY");
   if (!apiKey) {
