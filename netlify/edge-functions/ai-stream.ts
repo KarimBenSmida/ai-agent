@@ -90,7 +90,7 @@ const input = [
     },
     body: JSON.stringify({
       model: "gpt-5",              // reasoning-capable model for "Thinking"
-      reasoning: { effort: "low" },
+      // reasoning: { effort: "high" },
       stream: true,
       tools: [{ type: "web_search" }], 
       tool_choice: "auto", 
