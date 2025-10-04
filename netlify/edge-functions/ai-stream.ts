@@ -20,7 +20,7 @@ export default async (request: Request) => {
     });
   }
 
-  const { messages = [], system, temperature = 0.2 } = payload;
+  const { messages = [], system } = payload;
 
   // Build the "input" format expected by the Responses API
   const input = [
