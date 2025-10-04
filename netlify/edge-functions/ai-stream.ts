@@ -92,6 +92,8 @@ const input = [
       model: "gpt-5",              // reasoning-capable model for "Thinking"
       reasoning: { effort: "low" },
       stream: true,
+      tools: [{ type: "web_search" }], 
+      tool_choice: "auto", 
       input,
       // store: false,  // uncomment to disable OpenAI data retention (optional)
     }),
