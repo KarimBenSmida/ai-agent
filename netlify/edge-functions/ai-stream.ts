@@ -50,8 +50,8 @@ export default async (request: Request) => {
       Accept: "text/event-stream",
     },
     body: JSON.stringify({
-      model: "o4-mini",              // reasoning-capable model for "Thinking"
-      reasoning: { effort: "medium" },
+      model: "gpt-5",              // reasoning-capable model for "Thinking"
+      reasoning: { effort: "low" },
       stream: true,
       input,
       // store: false,  // uncomment to disable OpenAI data retention (optional)
