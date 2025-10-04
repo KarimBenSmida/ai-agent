@@ -9,14 +9,44 @@
 // OpenAI Responses API endpoint
 const OPENAI_URL = "https://api.openai.com/v1/responses";
 
+const ALLOW = (Netlify.env.get("ALLOW_ORIGINS") || "")
+  .split(",")
+  .map(s => s.trim())
+  .filter(Boolean);
+
+function corsOrigin(origin: string | null): string {
+  if (!origin) return "*";                 // safe default for tests
+  if (ALLOW.length === 0) return origin;   // reflect any (dev-only)
+  return ALLOW.includes(origin) ? origin : "null";
+}
+
+
 export default async (request: Request) => {
+    const origin = request.headers.get("origin");
+  const allowOrigin = corsOrigin(origin);
+
+  // --- CORS preflight ---
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": allowOrigin,
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Max-Age": "86400",
+      },
+    });
+  }
   let payload: any;
   try {
     payload = await request.json();
   } catch {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": allowOrigin,
+      },
     });
   }
 
@@ -37,7 +67,10 @@ export default async (request: Request) => {
   if (!apiKey) {
     return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": allowOrigin,
+      },
     });
   }
 
@@ -60,10 +93,13 @@ export default async (request: Request) => {
 
   if (!upstream.ok || !upstream.body) {
     const text = await upstream.text().catch(() => "");
-    return new Response(
-      JSON.stringify({ error: "OpenAI upstream error", detail: text }),
-      { status: upstream.status || 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "OpenAI upstream error", detail: text }), {
+      status: upstream.status || 502,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": allowOrigin,
+      },
+    });
   }
 
   // Stream the OpenAI Server-Sent Events directly to the client
@@ -74,7 +110,7 @@ export default async (request: Request) => {
       Connection: "keep-alive",
       "X-Accel-Buffering": "no",
       // 👇 Allow your AWS front-end to call this endpoint
-      "Access-Control-Allow-Origin": "https://your-aws-domain.com",
+      "Access-Control-Allow-Origin": allowOrigin,
     },
   });
 };
