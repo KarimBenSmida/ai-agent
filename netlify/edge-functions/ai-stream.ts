@@ -89,10 +89,10 @@ const input = [
       Accept: "text/event-stream",
     },
     body: JSON.stringify({
-      model: "gpt-5",              // reasoning-capable model for "Thinking"
+      model: "gpt-4o-mini",              // reasoning-capable model for "Thinking"
       // reasoning: { effort: "high" },
       stream: true,
-      tools: [{ type: "web_search" }], 
+      // tools: [{ type: "web_search" }], 
       tool_choice: "auto", 
       input,
       // store: false,  // uncomment to disable OpenAI data retention (optional)
